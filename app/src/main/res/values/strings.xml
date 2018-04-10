@@ -5,4 +5,11 @@
     <string name="title_activity_recipe_step_detail">RecipeStepDetailActivity</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+
+
+    <string name="please_wait_while_we_load">Please wait while we load...</string>
+    <string name="error_try_again_msg">Some error occured. Please try again</string>
+    <string name="no_recipes_found">No recipes found</string>
+    <string name="no_internet_msg">No internet connection. Please try again later</string>
+
 </resources>
