@@ -1,6 +1,7 @@
 package com.example.ssurendran.bakingapp.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ssurendran.bakingapp.R;
+import com.example.ssurendran.bakingapp.activities.RecipeDetailActivity;
 import com.example.ssurendran.bakingapp.models.RecipeModel;
 import com.squareup.picasso.Picasso;
 
@@ -19,6 +21,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.example.ssurendran.bakingapp.utils.Constants.EXTRA_RECIPE_ID;
+import static com.example.ssurendran.bakingapp.utils.Constants.EXTRA_RECIPE_NAME;
 
 /**
  * Created by ssurendran on 4/10/18.
@@ -41,8 +46,8 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        RecipeModel recipe = recipeList.get(position);
+    public void onBindViewHolder(ViewHolder holder, final int position) {
+        final RecipeModel recipe = recipeList.get(position);
         holder.recipeName.setText(recipe.getName());
 
         Picasso.with(context)
@@ -55,7 +60,10 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, "Recipe clicked", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(context, RecipeDetailActivity.class);
+                intent.putExtra(EXTRA_RECIPE_ID, recipe.getId());
+                intent.putExtra(EXTRA_RECIPE_NAME, recipe.getName());
+                context.startActivity(intent);
             }
         });
 

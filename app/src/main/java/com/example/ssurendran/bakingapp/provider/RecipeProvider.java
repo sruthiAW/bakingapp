@@ -31,7 +31,7 @@ public final class RecipeProvider {
         @ContentUri(
                 path = "ingredients",
                 type = "vnd.android.cursor.dir/ingredients",
-                defaultSort = RecipeContract.IngredientTableColumns.COLUMN_ID + " ASC")
+                defaultSort = RecipeContract.IngredientTableColumns.COLUMN_INGREDIENT_ID + " ASC")
         public static final Uri INGREDIENTS_CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/ingredients");
     }
 
@@ -41,7 +41,7 @@ public final class RecipeProvider {
         @ContentUri(
                 path = "steps",
                 type = "vnd.android.cursor.dir/steps",
-                defaultSort = RecipeContract.StepsTableColumns.COLUMN_ID + " ASC")
+                defaultSort = RecipeContract.StepsTableColumns.COLUMN_STEP_ID + " ASC")
         public static final Uri STEPS_CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/steps");
     }
 }
