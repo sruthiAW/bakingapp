@@ -14,5 +14,7 @@
     <string name="ingredients_item_title">Ingredients</string>
     <string name="getting_details">Getting Details...</string>
     <string name="something_went_wrong_try_again">Something went wrong. Please try again</string>
+    <string name="previous">PREVIOUS</string>
+    <string name="next">NEXT</string>
 
 </resources>

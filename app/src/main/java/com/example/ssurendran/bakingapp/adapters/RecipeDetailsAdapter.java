@@ -101,7 +101,7 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
                     //TODO: modify for tablets
                     Intent intent = new Intent(context, RecipeStepDetailActivity.class);
                     intent.putExtra(Constants.EXTRA_STEP_ID, position-1);
-//                    context.startActivity(intent);
+                    context.startActivity(intent);
                 }
             });
         }
