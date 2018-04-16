@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -31,6 +30,7 @@ public class RecipeDetailFragment extends Fragment {
 
     public static final String RECIPE_ID = "recipe_id";
     public static final String RECIPE_NAME = "recipe_name";
+    private static final String SELECTED_POSITION = "selected_item_position";
 
     @BindView(R.id.detail_rv)
     RecyclerView detailRecyclerView;
@@ -43,6 +43,7 @@ public class RecipeDetailFragment extends Fragment {
     private Cursor stepsCursor;
     private RecipeDetailsAdapter detailsAdapter;
     private String recipeName;
+    private int selectedPosition = -1;
 
 
     public static RecipeDetailFragment newInstance(String recipeId, String recipeName) {
@@ -53,6 +54,17 @@ public class RecipeDetailFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
+    public static RecipeDetailFragment newInstance(String recipeId, String recipeName, int selectedPositionInList) {
+        Bundle args = new Bundle();
+        args.putString(RECIPE_ID, recipeId);
+        args.putString(RECIPE_NAME, recipeName);
+        args.putInt(SELECTED_POSITION, selectedPositionInList);
+        RecipeDetailFragment fragment = new RecipeDetailFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
 
     @Nullable
     @Override
@@ -67,6 +79,7 @@ public class RecipeDetailFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recipeName = getArguments().getString(RECIPE_NAME);
+        selectedPosition = getArguments().getInt(SELECTED_POSITION, -1);
 
         setUpRecyclerView();
     }
@@ -86,7 +99,7 @@ public class RecipeDetailFragment extends Fragment {
     }
 
     private void updateRecyclerData() {
-        ((RecipeDetailsAdapter)detailRecyclerView.getAdapter()).refreshData(recipeName, ingredientCursor, stepsCursor);
+        ((RecipeDetailsAdapter)detailRecyclerView.getAdapter()).refreshData(recipeName, ingredientCursor, stepsCursor, selectedPosition);
     }
 
     @Override

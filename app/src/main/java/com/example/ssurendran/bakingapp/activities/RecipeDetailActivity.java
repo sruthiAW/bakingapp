@@ -19,10 +19,12 @@ import butterknife.ButterKnife;
 public class RecipeDetailActivity extends AppCompatActivity implements RecipeDetailsAdapter.FragmentChanger {
 
     private static final String CURRENT_STEP_ID = "current_recipe_id";
+    private static final String CURRENT_SELECTED_POSITION = "current_selected_position";
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     private String currentRecipeId;
     private String currentStepId;
+    private int selectedPositionInList = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,7 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeDet
 
         if (savedInstanceState != null){
             currentStepId = savedInstanceState.getString(CURRENT_STEP_ID);
+            selectedPositionInList = savedInstanceState.getInt(CURRENT_SELECTED_POSITION, -1);
         }
 
         setUpFragments();
@@ -60,6 +63,9 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeDet
         if (currentRecipeId != null && currentStepId != null){
             outState.putString(CURRENT_STEP_ID, currentStepId);
         }
+        if (selectedPositionInList !=  -1){
+            outState.putInt(CURRENT_SELECTED_POSITION, selectedPositionInList);
+        }
         super.onSaveInstanceState(outState);
     }
 
@@ -72,8 +78,14 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeDet
                     getIntent().getStringExtra(Constants.EXTRA_RECIPE_NAME)));
             fragmentTransaction.commit();
         } else {
-            fragmentTransaction.replace(R.id.detail_frag_container, RecipeDetailFragment.newInstance(getIntent().getStringExtra(Constants.EXTRA_RECIPE_ID),
-                    getIntent().getStringExtra(Constants.EXTRA_RECIPE_NAME)));
+
+            if (selectedPositionInList == -1) {
+                fragmentTransaction.replace(R.id.detail_frag_container, RecipeDetailFragment.newInstance(getIntent().getStringExtra(Constants.EXTRA_RECIPE_ID),
+                        getIntent().getStringExtra(Constants.EXTRA_RECIPE_NAME)));
+            } else {
+                fragmentTransaction.replace(R.id.detail_frag_container, RecipeDetailFragment.newInstance(getIntent().getStringExtra(Constants.EXTRA_RECIPE_ID),
+                        getIntent().getStringExtra(Constants.EXTRA_RECIPE_NAME), selectedPositionInList));
+            }
 
             if (currentStepId != null) {
                 fragmentTransaction.replace(R.id.step_detail_frag_container, RecipeStepDetailFragment.newInstance(getIntent().getStringExtra(Constants.EXTRA_RECIPE_ID),
@@ -94,5 +106,10 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeDet
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.step_detail_frag_container, RecipeStepDetailFragment.newInstance(recipeId, stepId));
         fragmentTransaction.commit();
+    }
+
+    @Override
+    public void saveSelectedPositionInList(int selectedPosition) {
+        selectedPositionInList = selectedPosition;
     }
 }

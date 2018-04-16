@@ -29,11 +29,13 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
 
     private static final int INGREDIENT_TYPE = 0;
     private static final int STEPS_TYPE = 1;
+    private static final int SELECTED_STEP_TYPE = 2;
 
     private final Context context;
     private Cursor ingredientCursor;
     private Cursor stepsCursor;
     private String recipeName;
+    private int selectedPosition = -1;
 
     public RecipeDetailsAdapter(Context context, String recipeName, Cursor ingredientCursor, Cursor stepsCursor) {
         this.context = context;
@@ -46,7 +48,11 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
     public int getItemViewType(int position) {
         if (position == 0) {
             return INGREDIENT_TYPE;
-        } else {
+        }
+        else if (position == selectedPosition){
+            return SELECTED_STEP_TYPE;
+        }
+        else {
             return STEPS_TYPE;
         }
     }
@@ -57,8 +63,11 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
 
         if (viewType == INGREDIENT_TYPE) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.ingredient_item_layout, parent, false);
+        } else if (viewType == STEPS_TYPE){
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.steps_item_layout, parent, false);
         } else {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.steps_item_layout, parent, false);
+            view.setBackgroundColor(ContextCompat.getColor(context, R.color.blue));
         }
 
         return new ViewHolder(view);
@@ -97,6 +106,10 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
 
             }
 
+//            if (position == selectedPosition){
+//                holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.blue));
+//            }
+
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -114,9 +127,11 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
                         context.startActivity(intent);
 
                     } else {
-                        holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.blue));
+                        selectedPosition = position;
                         FragmentChanger fragmentChanger = (FragmentChanger)context;
                         fragmentChanger.changeStepDetailFragment(recipeId, String.valueOf(position - 1));
+                        fragmentChanger.saveSelectedPositionInList(selectedPosition);
+                        notifyDataSetChanged();
                     }
                 }
             });
@@ -128,10 +143,11 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
         return 1 + stepsCursor.getCount();
     }
 
-    public void refreshData(String recipeName, Cursor ingredientCursor, Cursor stepsCursor) {
+    public void refreshData(String recipeName, Cursor ingredientCursor, Cursor stepsCursor, int selectedPosition) {
         this.recipeName = recipeName;
         this.ingredientCursor = ingredientCursor;
         this.stepsCursor = stepsCursor;
+        this.selectedPosition = selectedPosition;
         this.notifyDataSetChanged();
     }
 
@@ -153,6 +169,7 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
 
     public interface FragmentChanger{
         void changeStepDetailFragment(String recipeId, String stepId);
+        void saveSelectedPositionInList(int selectedPosition);
     }
 
 }

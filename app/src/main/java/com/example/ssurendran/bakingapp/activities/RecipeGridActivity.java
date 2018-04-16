@@ -63,7 +63,7 @@ public class RecipeGridActivity extends AppCompatActivity implements Connectivit
 
     private void setUpRecyclerView() {
         mRecipeListAdapter = new RecipeListAdapter(this, new ArrayList<RecipeModel>());
-        recipeRecyclerView.setLayoutManager(new GridLayoutManager(this, 2)); //TODO: change span based on device size (in dimen file)
+        recipeRecyclerView.setLayoutManager(new GridLayoutManager(this, getResources().getInteger(R.integer.grid_span_count))); //TODO: change span based on device size (in dimen file)
         recipeRecyclerView.addItemDecoration(new ItemOffsetDecoration(this, R.dimen.grid_spacing));
         recipeRecyclerView.setHasFixedSize(true);
         recipeRecyclerView.setAdapter(mRecipeListAdapter);
