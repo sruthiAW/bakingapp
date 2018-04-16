@@ -16,5 +16,6 @@
     <string name="something_went_wrong_try_again">Something went wrong. Please try again</string>
     <string name="previous">PREVIOUS</string>
     <string name="next">NEXT</string>
+    <string name="click_on_step_to_view">Click on a step to view details</string>
 
 </resources>

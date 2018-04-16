@@ -11,5 +11,6 @@ http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
 
     <dimen name="grid_spacing">5dp</dimen>
     <dimen name="bottom_navigator_height">60dp</dimen>
+    <dimen name="tablet_details_frag_width">250dp</dimen>
 
 </resources>

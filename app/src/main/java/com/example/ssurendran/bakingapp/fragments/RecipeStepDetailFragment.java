@@ -71,6 +71,10 @@ public class RecipeStepDetailFragment extends Fragment {
     private String recipeId;
     private String stepId;
 
+    public static RecipeStepDetailFragment newInstance() {
+        return new RecipeStepDetailFragment();
+    }
+
     public static RecipeStepDetailFragment newInstance(String recipeId, String stepId) {
         Bundle args = new Bundle();
         args.putString(RECIPE_ID, recipeId);
@@ -86,8 +90,13 @@ public class RecipeStepDetailFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_recipe_step_detail_layout, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        recipeId = getArguments().getString(RECIPE_ID);
-        stepId = getArguments().getString(STEP_ID);
+        if (getArguments() != null) {
+            recipeId = getArguments().getString(RECIPE_ID);
+            stepId = getArguments().getString(STEP_ID);
+            showAllViews();
+        } else {
+            hideAllViews();
+        }
 
         setUpInitialUI();
 
@@ -97,7 +106,19 @@ public class RecipeStepDetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        fetchStepDetails();
+        if (getArguments() != null) {
+            fetchStepDetails();
+        }
+    }
+
+    private void hideAllViews(){
+        mainContainerLl.setVisibility(View.GONE);
+        loadingTv.setText(R.string.click_on_step_to_view);
+    }
+
+    private void showAllViews(){
+        mainContainerLl.setVisibility(View.VISIBLE);
+        loadingTv.setText("");
     }
 
     private void setUpInitialUI(){
@@ -142,7 +163,7 @@ public class RecipeStepDetailFragment extends Fragment {
         }
     }
 
-    public static boolean isVideoFile(String path) {
+    private static boolean isVideoFile(String path) {
         if (!TextUtils.isEmpty(path)) {
             String mimeType = URLConnection.guessContentTypeFromName(path);
             return mimeType != null && mimeType.startsWith("video");

@@ -3,6 +3,7 @@ package com.example.ssurendran.bakingapp.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,7 +65,7 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         if (position == 0) {
             StringBuilder stringBuilder = new StringBuilder();
             if (ingredientCursor != null && ingredientCursor.getCount() > 0) {
@@ -99,19 +100,24 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //in phones
-                    //TODO: modify for tablets
 
                     stepsCursor.moveToPosition(position-1);
 
                     String recipeId = stepsCursor.getString(stepsCursor.getColumnIndex(RecipeContract.StepsTableColumns.COLUMN_RECIPE_ID));
 
-                    Intent intent = new Intent(context, RecipeStepDetailActivity.class);
-                    intent.putExtra(Constants.EXTRA_RECIPE_ID, recipeId);
-                    intent.putExtra(Constants.EXTRA_STEP_ID, String.valueOf(position-1));
-                    intent.putExtra(Constants.EXTRA_RECIPE_NAME, recipeName);
-                    intent.putExtra(Constants.EXTRA_STEP_COUNT, stepsCursor.getCount());
-                    context.startActivity(intent);
+                    if(!context.getResources().getBoolean(R.bool.isTablet)) {
+                        Intent intent = new Intent(context, RecipeStepDetailActivity.class);
+                        intent.putExtra(Constants.EXTRA_RECIPE_ID, recipeId);
+                        intent.putExtra(Constants.EXTRA_STEP_ID, String.valueOf(position - 1));
+                        intent.putExtra(Constants.EXTRA_RECIPE_NAME, recipeName);
+                        intent.putExtra(Constants.EXTRA_STEP_COUNT, stepsCursor.getCount());
+                        context.startActivity(intent);
+
+                    } else {
+                        holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.blue));
+                        FragmentChanger fragmentChanger = (FragmentChanger)context;
+                        fragmentChanger.changeStepDetailFragment(recipeId, String.valueOf(position - 1));
+                    }
                 }
             });
         }
@@ -143,6 +149,10 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
+    }
+
+    public interface FragmentChanger{
+        void changeStepDetailFragment(String recipeId, String stepId);
     }
 
 }
