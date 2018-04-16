@@ -30,6 +30,7 @@ import butterknife.Unbinder;
 public class RecipeDetailFragment extends Fragment {
 
     public static final String RECIPE_ID = "recipe_id";
+    public static final String RECIPE_NAME = "recipe_name";
 
     @BindView(R.id.detail_rv)
     RecyclerView detailRecyclerView;
@@ -41,11 +42,13 @@ public class RecipeDetailFragment extends Fragment {
     private Cursor ingredientCursor;
     private Cursor stepsCursor;
     private RecipeDetailsAdapter detailsAdapter;
+    private String recipeName;
 
 
-    public static RecipeDetailFragment newInstance(String recipeId) {
+    public static RecipeDetailFragment newInstance(String recipeId, String recipeName) {
         Bundle args = new Bundle();
         args.putString(RECIPE_ID, recipeId);
+        args.putString(RECIPE_NAME, recipeName);
         RecipeDetailFragment fragment = new RecipeDetailFragment();
         fragment.setArguments(args);
         return fragment;
@@ -64,20 +67,21 @@ public class RecipeDetailFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         String recipeId = getArguments().getString(RECIPE_ID);
+        recipeName = getArguments().getString(RECIPE_NAME);
 
         setUpRecyclerView();
         fetchRecipeDetailsFromDb(recipeId);
     }
 
     private void setUpRecyclerView() {
-        detailsAdapter = new RecipeDetailsAdapter(getActivity(), null, null);
+        detailsAdapter = new RecipeDetailsAdapter(getActivity(), recipeName, null, null);
         detailRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        detailRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(10));
+        detailRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(15));
         detailRecyclerView.setAdapter(detailsAdapter);
     }
 
     private void updateRecyclerData() {
-        ((RecipeDetailsAdapter)detailRecyclerView.getAdapter()).refreshData(ingredientCursor, stepsCursor);
+        ((RecipeDetailsAdapter)detailRecyclerView.getAdapter()).refreshData(recipeName, ingredientCursor, stepsCursor);
     }
 
     @Override

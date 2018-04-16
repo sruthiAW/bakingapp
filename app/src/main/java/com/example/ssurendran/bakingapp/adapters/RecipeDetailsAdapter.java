@@ -32,11 +32,13 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
     private final Context context;
     private Cursor ingredientCursor;
     private Cursor stepsCursor;
+    private String recipeName;
 
-    public RecipeDetailsAdapter(Context context, Cursor ingredientCursor, Cursor stepsCursor) {
+    public RecipeDetailsAdapter(Context context, String recipeName, Cursor ingredientCursor, Cursor stepsCursor) {
         this.context = context;
         this.ingredientCursor = ingredientCursor;
         this.stepsCursor = stepsCursor;
+        this.recipeName = recipeName;
     }
 
     @Override
@@ -86,7 +88,7 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
             if (stepsCursor != null && stepsCursor.getCount() > 0) {
                 stepsCursor.moveToPosition(position-1);
 
-                stringBuilder.append(Integer.parseInt(stepsCursor.getString(stepsCursor.getColumnIndex(RecipeContract.StepsTableColumns.COLUMN_STEP_ID))) + 1)
+                stringBuilder.append(Integer.parseInt(stepsCursor.getString(stepsCursor.getColumnIndex(RecipeContract.StepsTableColumns.COLUMN_STEP_ID)))+1)
                         .append(". ")
                         .append(stepsCursor.getString(stepsCursor.getColumnIndex(RecipeContract.StepsTableColumns.COLUMN_SHORT_DESCRIPTION)));
 
@@ -99,8 +101,16 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
                 public void onClick(View v) {
                     //in phones
                     //TODO: modify for tablets
+
+                    stepsCursor.moveToPosition(position-1);
+
+                    String recipeId = stepsCursor.getString(stepsCursor.getColumnIndex(RecipeContract.StepsTableColumns.COLUMN_RECIPE_ID));
+
                     Intent intent = new Intent(context, RecipeStepDetailActivity.class);
-                    intent.putExtra(Constants.EXTRA_STEP_ID, position-1);
+                    intent.putExtra(Constants.EXTRA_RECIPE_ID, recipeId);
+                    intent.putExtra(Constants.EXTRA_STEP_ID, String.valueOf(position-1));
+                    intent.putExtra(Constants.EXTRA_RECIPE_NAME, recipeName);
+                    intent.putExtra(Constants.EXTRA_STEP_COUNT, stepsCursor.getCount());
                     context.startActivity(intent);
                 }
             });
@@ -109,10 +119,11 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
 
     @Override
     public int getItemCount() {
-        return stepsCursor.getCount() + 1;
+        return 1 + stepsCursor.getCount();
     }
 
-    public void refreshData(Cursor ingredientCursor, Cursor stepsCursor) {
+    public void refreshData(String recipeName, Cursor ingredientCursor, Cursor stepsCursor) {
+        this.recipeName = recipeName;
         this.ingredientCursor = ingredientCursor;
         this.stepsCursor = stepsCursor;
         this.notifyDataSetChanged();

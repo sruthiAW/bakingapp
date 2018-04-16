@@ -27,7 +27,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         Intent receivedIntent = getIntent();
-        if(receivedIntent.getStringExtra(Constants.EXTRA_RECIPE_NAME) != null){
+        if (receivedIntent.getStringExtra(Constants.EXTRA_RECIPE_NAME) != null) {
             getSupportActionBar().setTitle(receivedIntent.getStringExtra(Constants.EXTRA_RECIPE_NAME));
         }
 
@@ -47,10 +47,11 @@ public class RecipeDetailActivity extends AppCompatActivity {
 
     }
 
-    private void setUpFragments(){
+    private void setUpFragments() {
         //if phone
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.detail_frag_container, RecipeDetailFragment.newInstance(getIntent().getStringExtra(Constants.EXTRA_RECIPE_ID)));
+        fragmentTransaction.replace(R.id.detail_frag_container, RecipeDetailFragment.newInstance(getIntent().getStringExtra(Constants.EXTRA_RECIPE_ID),
+                getIntent().getStringExtra(Constants.EXTRA_RECIPE_NAME)));
         fragmentTransaction.commit();
     }
 
