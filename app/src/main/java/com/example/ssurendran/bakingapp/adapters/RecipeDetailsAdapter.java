@@ -72,7 +72,7 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
                     stringBuilder.append(Integer.parseInt(ingredientCursor.getString(ingredientCursor.getColumnIndex(RecipeContract.IngredientTableColumns.COLUMN_INGREDIENT_ID))) + 1)
                             .append(". ")
                             .append(ingredientCursor.getString(ingredientCursor.getColumnIndex(RecipeContract.IngredientTableColumns.COLUMN_NAME)))
-                            .append("\t")
+                            .append(" -- ")
                             .append(ingredientCursor.getString(ingredientCursor.getColumnIndex(RecipeContract.IngredientTableColumns.COLUMN_QUANTITY)))
                             .append(" ")
                             .append(ingredientCursor.getString(ingredientCursor.getColumnIndex(RecipeContract.IngredientTableColumns.COLUMN_MEASURE)))

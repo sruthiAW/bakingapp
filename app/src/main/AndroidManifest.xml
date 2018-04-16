@@ -42,7 +42,7 @@
                 android:value="com.example.ssurendran.bakingapp.activities.RecipeDetailActivity" />
         </activity>
 
-        <receiver android:name=".BakingAppWidget">
+        <receiver android:name=".widgets.BakingAppWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -55,7 +55,12 @@
         <provider
             android:name=".provider.generated.RecipeProvider"
             android:authorities="com.example.ssurendran.bakingapp.provider"
-            android:exported="false" />
+            android:exported="true" />
+
+        <service
+            android:name=".widgets.BakingWidgetService"
+            android:exported="true"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 
 </manifest>

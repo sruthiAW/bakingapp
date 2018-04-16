@@ -1,6 +1,7 @@
 package com.example.ssurendran.bakingapp.activities;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -176,7 +177,6 @@ public class RecipeGridActivity extends AppCompatActivity implements Connectivit
         }.execute(null, null, null);
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_recipe_grid, menu);
@@ -200,4 +200,5 @@ public class RecipeGridActivity extends AppCompatActivity implements Connectivit
             fetchRecipeList();
         }
     }
+
 }

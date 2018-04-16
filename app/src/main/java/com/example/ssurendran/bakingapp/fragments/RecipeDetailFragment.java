@@ -66,10 +66,15 @@ public class RecipeDetailFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        String recipeId = getArguments().getString(RECIPE_ID);
         recipeName = getArguments().getString(RECIPE_NAME);
 
         setUpRecyclerView();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        String recipeId = getArguments().getString(RECIPE_ID);
         fetchRecipeDetailsFromDb(recipeId);
     }
 
@@ -106,8 +111,8 @@ public class RecipeDetailFragment extends Fragment {
 
                 String SELECTION_STRING = RecipeContract.IngredientTableColumns.COLUMN_RECIPE_ID + "=?";
 
-                ingredientCursor = getContext().getContentResolver().query(RecipeProvider.INGREDIENTS.INGREDIENTS_CONTENT_URI, null, SELECTION_STRING, new String[]{recipeId}, null, null);
-                stepsCursor = getContext().getContentResolver().query(RecipeProvider.STEPS.STEPS_CONTENT_URI, null, SELECTION_STRING, new String[]{recipeId}, null, null);
+                ingredientCursor = getActivity().getContentResolver().query(RecipeProvider.INGREDIENTS.INGREDIENTS_CONTENT_URI, null, SELECTION_STRING, new String[]{recipeId}, null, null);
+                stepsCursor = getActivity().getContentResolver().query(RecipeProvider.STEPS.STEPS_CONTENT_URI, null, SELECTION_STRING, new String[]{recipeId}, null, null);
 
                 return null;
             }

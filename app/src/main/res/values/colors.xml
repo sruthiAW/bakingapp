@@ -10,4 +10,5 @@
     <color name="white_grey">#FAFAFA</color>
     <color name="blue_grey">#263238</color>
     <color name="light_green">#E3F2FD</color>
+    <color name="yellow">#FDD835</color>
 </resources>

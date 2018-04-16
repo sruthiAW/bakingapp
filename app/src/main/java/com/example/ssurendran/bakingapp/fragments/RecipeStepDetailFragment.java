@@ -1,12 +1,14 @@
 package com.example.ssurendran.bakingapp.fragments;
 
 import android.database.Cursor;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,9 +89,26 @@ public class RecipeStepDetailFragment extends Fragment {
         recipeId = getArguments().getString(RECIPE_ID);
         stepId = getArguments().getString(STEP_ID);
 
-        fetchStepDetails();
+        setUpInitialUI();
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        fetchStepDetails();
+    }
+
+    private void setUpInitialUI(){
+        if (getActivity().getResources().getBoolean(R.bool.isLandscape)) {
+            Point size = new Point();
+            getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+            int screenHeight = size.y;
+
+            ViewGroup.LayoutParams params = mediaContainer.getLayoutParams();
+            params.height = screenHeight - getStatusBarHeight() - getAppBarHeight() - getBottomPageNavigatorHeight();
+        }
     }
 
     private void populateUI(StepModel stepModel) {
@@ -147,7 +166,7 @@ public class RecipeStepDetailFragment extends Fragment {
             protected StepModel doInBackground(Void... voids) {
 
                 String SELECTION_STRING = RecipeContract.StepsTableColumns.COLUMN_RECIPE_ID + "=? AND " + RecipeContract.StepsTableColumns.COLUMN_STEP_ID + "=?";
-                Cursor stepsCursor = getContext().getContentResolver().query(RecipeProvider.STEPS.STEPS_CONTENT_URI, null, SELECTION_STRING, new String[]{recipeId, stepId}, null, null);
+                Cursor stepsCursor = getActivity().getContentResolver().query(RecipeProvider.STEPS.STEPS_CONTENT_URI, null, SELECTION_STRING, new String[]{recipeId, stepId}, null, null);
 
                 if (stepsCursor != null && stepsCursor.moveToNext()) {
                     StepModel stepModel = new StepModel();
@@ -200,6 +219,29 @@ public class RecipeStepDetailFragment extends Fragment {
             mExoPlayer.release();
             mExoPlayer = null;
         }
+    }
+
+    private int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getActivity().getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
+    private int getAppBarHeight() {
+        int actionBarHeight = 0;
+        TypedValue tv = new TypedValue();
+        if (getActivity().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+        {
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
+        }
+        return actionBarHeight;
+    }
+
+    private int getBottomPageNavigatorHeight(){
+        return getActivity().getResources().getDimensionPixelSize(R.dimen.bottom_navigator_height);
     }
 
     @Override

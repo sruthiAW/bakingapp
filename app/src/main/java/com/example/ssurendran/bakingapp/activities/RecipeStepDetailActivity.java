@@ -2,16 +2,20 @@ package com.example.ssurendran.bakingapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.ssurendran.bakingapp.R;
 import com.example.ssurendran.bakingapp.fragments.RecipeStepDetailFragment;
+import com.example.ssurendran.bakingapp.utils.BottomNavigationViewBehavior;
 import com.example.ssurendran.bakingapp.utils.Constants;
 
 import butterknife.BindView;
@@ -20,6 +24,7 @@ import butterknife.OnClick;
 
 public class RecipeStepDetailActivity extends AppCompatActivity {
 
+    private static final String CURRENT_STEP_ID = "current_step_id";
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.step_detail_frag_container)
@@ -30,6 +35,8 @@ public class RecipeStepDetailActivity extends AppCompatActivity {
     TextView pageId;
     @BindView(R.id.next_tv)
     TextView nextTv;
+    @BindView(R.id.bottom_navigator)
+    RelativeLayout bottomNavigator;
 
     private String recipeId;
     private int currentStepId;
@@ -50,21 +57,34 @@ public class RecipeStepDetailActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         recipeId = receivedIntent.getStringExtra(Constants.EXTRA_RECIPE_ID);
-        currentStepId = Integer.valueOf(receivedIntent.getStringExtra(Constants.EXTRA_STEP_ID));
         totalStepCount = receivedIntent.getIntExtra(Constants.EXTRA_STEP_COUNT, -1);
 
+        if (savedInstanceState == null) {
+            currentStepId = Integer.valueOf(receivedIntent.getStringExtra(Constants.EXTRA_STEP_ID));
+        } else {
+            currentStepId = savedInstanceState.getInt(CURRENT_STEP_ID);
+        }
+
+        setUpBottomNavigatorScroll();
         setUpBottomNavigationUI();
         setUpFragments(recipeId, currentStepId);
     }
 
-    private void setUpBottomNavigationUI(){
-        if (currentStepId == 0){
+    private void setUpBottomNavigatorScroll() {
+        if(getResources().getBoolean(R.bool.isLandscape)) {
+            CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) bottomNavigator.getLayoutParams();
+            layoutParams.setBehavior(new BottomNavigationViewBehavior());
+        }
+    }
+
+    private void setUpBottomNavigationUI() {
+        if (currentStepId == 0) {
             prevTv.setEnabled(false);
         } else {
             prevTv.setEnabled(true);
         }
 
-        if (currentStepId + 1 == totalStepCount){
+        if (currentStepId + 1 == totalStepCount) {
             nextTv.setEnabled(false);
         } else {
             nextTv.setEnabled(true);
@@ -88,6 +108,12 @@ public class RecipeStepDetailActivity extends AppCompatActivity {
         }
         return true;
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(CURRENT_STEP_ID, currentStepId);
+        super.onSaveInstanceState(outState);
     }
 
     private void setUpFragments(String recipeId, int stepId) {
