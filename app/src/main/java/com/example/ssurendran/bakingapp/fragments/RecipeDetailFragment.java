@@ -133,7 +133,7 @@ public class RecipeDetailFragment extends Fragment {
             @Override
             protected void onPostExecute(Void aVoid) {
 
-                if (ingredientCursor == null || stepsCursor == null){
+                if (ingredientCursor == null || stepsCursor == null || ingredientCursor.getCount() == 0 || stepsCursor.getCount() == 0){
                     loadingTextView.setText(R.string.something_went_wrong_try_again);
                     return;
                 }
