@@ -70,7 +70,6 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeDet
     }
 
     private void setUpFragments() {
-        //if phone
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
         if (!getResources().getBoolean(R.bool.isTablet)) {

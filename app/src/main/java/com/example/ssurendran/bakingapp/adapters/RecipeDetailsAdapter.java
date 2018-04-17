@@ -106,10 +106,6 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
 
             }
 
-//            if (position == selectedPosition){
-//                holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.blue));
-//            }
-
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

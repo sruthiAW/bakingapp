@@ -117,7 +117,6 @@ public class RecipeStepDetailActivity extends AppCompatActivity {
     }
 
     private void setUpFragments(String recipeId, int stepId) {
-        //if phone
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.step_detail_frag_container, RecipeStepDetailFragment.newInstance(recipeId, String.valueOf(stepId)));
         fragmentTransaction.commit();
