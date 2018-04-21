@@ -36,12 +36,14 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
     private Cursor stepsCursor;
     private String recipeName;
     private int selectedPosition = -1;
+    private SelectedPositionListener selectedPositionListener;
 
-    public RecipeDetailsAdapter(Context context, String recipeName, Cursor ingredientCursor, Cursor stepsCursor) {
+    public RecipeDetailsAdapter(Context context, String recipeName, Cursor ingredientCursor, Cursor stepsCursor, SelectedPositionListener selectedPositionListener) {
         this.context = context;
         this.ingredientCursor = ingredientCursor;
         this.stepsCursor = stepsCursor;
         this.recipeName = recipeName;
+        this.selectedPositionListener = selectedPositionListener;
     }
 
     @Override
@@ -126,7 +128,7 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
                         selectedPosition = position;
                         FragmentChanger fragmentChanger = (FragmentChanger)context;
                         fragmentChanger.changeStepDetailFragment(recipeId, String.valueOf(position - 1));
-                        fragmentChanger.saveSelectedPositionInList(selectedPosition);
+                        selectedPositionListener.saveSelectedPositionInList(selectedPosition);
                         notifyDataSetChanged();
                     }
                 }
@@ -136,7 +138,7 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
 
     @Override
     public int getItemCount() {
-        return 1 + stepsCursor.getCount();
+        return stepsCursor == null ? 0 : (1 + stepsCursor.getCount());
     }
 
     public void refreshData(String recipeName, Cursor ingredientCursor, Cursor stepsCursor, int selectedPosition) {
@@ -165,6 +167,9 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
 
     public interface FragmentChanger{
         void changeStepDetailFragment(String recipeId, String stepId);
+    }
+
+    public interface SelectedPositionListener{
         void saveSelectedPositionInList(int selectedPosition);
     }
 

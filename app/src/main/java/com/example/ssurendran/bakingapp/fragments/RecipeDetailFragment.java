@@ -26,11 +26,13 @@ import butterknife.Unbinder;
  * Created by ssurendran on 4/9/18.
  */
 
-public class RecipeDetailFragment extends Fragment {
+public class RecipeDetailFragment extends Fragment implements RecipeDetailsAdapter.SelectedPositionListener {
 
     public static final String RECIPE_ID = "recipe_id";
     public static final String RECIPE_NAME = "recipe_name";
     private static final String SELECTED_POSITION = "selected_item_position";
+    private static final String RECYCLER_FIRST_COMPLETELY_VISIBLE_ITEM = "recycler_first_completely_visible_item";
+    private static final String CURRENT_SELECTED_POSITION = "current_selected_position";
 
     @BindView(R.id.detail_rv)
     RecyclerView detailRecyclerView;
@@ -81,7 +83,7 @@ public class RecipeDetailFragment extends Fragment {
         recipeName = getArguments().getString(RECIPE_NAME);
         selectedPosition = getArguments().getInt(SELECTED_POSITION, -1);
 
-        setUpRecyclerView();
+        setUpRecyclerView(savedInstanceState);
     }
 
     @Override
@@ -91,15 +93,37 @@ public class RecipeDetailFragment extends Fragment {
         fetchRecipeDetailsFromDb(recipeId);
     }
 
-    private void setUpRecyclerView() {
-        detailsAdapter = new RecipeDetailsAdapter(getActivity(), recipeName, null, null);
+    private void setUpRecyclerView(@Nullable Bundle savedInstanceState) {
+        detailsAdapter = new RecipeDetailsAdapter(getActivity(), recipeName, null, null, this);
         detailRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         detailRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(15));
         detailRecyclerView.setAdapter(detailsAdapter);
+
+        if (savedInstanceState != null){
+
+            int firstVisibleItem = savedInstanceState.getInt(RECYCLER_FIRST_COMPLETELY_VISIBLE_ITEM);
+            selectedPosition = savedInstanceState.getInt(CURRENT_SELECTED_POSITION, -1);
+            int scrollPosition = 0;
+
+            if (getActivity().getResources().getBoolean(R.bool.isTablet) && selectedPosition > firstVisibleItem){
+                scrollPosition = selectedPosition;
+            } else {
+                scrollPosition = firstVisibleItem;
+            }
+            detailRecyclerView.smoothScrollToPosition(scrollPosition);
+
+        }
     }
 
     private void updateRecyclerData() {
         ((RecipeDetailsAdapter)detailRecyclerView.getAdapter()).refreshData(recipeName, ingredientCursor, stepsCursor, selectedPosition);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt(RECYCLER_FIRST_COMPLETELY_VISIBLE_ITEM, ((LinearLayoutManager)detailRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition());
+        outState.putInt(CURRENT_SELECTED_POSITION, selectedPosition);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -147,4 +171,8 @@ public class RecipeDetailFragment extends Fragment {
         }.execute(null, null, null);
     }
 
+    @Override
+    public void saveSelectedPositionInList(int selectedPosition) {
+        this.selectedPosition = selectedPosition;
+    }
 }
