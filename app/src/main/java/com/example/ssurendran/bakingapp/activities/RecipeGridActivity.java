@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -35,6 +36,7 @@ import butterknife.ButterKnife;
 
 public class RecipeGridActivity extends AppCompatActivity implements ConnectivityReceiver.ConnectivityCallback {
 
+    private static final String RECYCLER_FIRST_COMPLETELY_VISIBLE_ITEM = "first_completely_visible_item";
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.no_content)
@@ -55,18 +57,22 @@ public class RecipeGridActivity extends AppCompatActivity implements Connectivit
 
         mRequestsBuilder = new RequestsBuilder(this);
 
-        setUpRecyclerView();
+        setUpRecyclerView(savedInstanceState);
 
         fetchRecipeList();
 
     }
 
-    private void setUpRecyclerView() {
+    private void setUpRecyclerView(Bundle savedInstanceState) {
         mRecipeListAdapter = new RecipeListAdapter(this, new ArrayList<RecipeModel>());
         recipeRecyclerView.setLayoutManager(new GridLayoutManager(this, getResources().getInteger(R.integer.grid_span_count)));
         recipeRecyclerView.addItemDecoration(new ItemOffsetDecoration(this, R.dimen.grid_spacing));
         recipeRecyclerView.setHasFixedSize(true);
         recipeRecyclerView.setAdapter(mRecipeListAdapter);
+
+        if (savedInstanceState != null){
+            recipeRecyclerView.scrollToPosition(savedInstanceState.getInt(RECYCLER_FIRST_COMPLETELY_VISIBLE_ITEM));
+        }
     }
 
     private void updateRecyclerView(List<RecipeModel> recipeList) {
@@ -192,6 +198,12 @@ public class RecipeGridActivity extends AppCompatActivity implements Connectivit
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(RECYCLER_FIRST_COMPLETELY_VISIBLE_ITEM, ((LinearLayoutManager)recipeRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition());
+        super.onSaveInstanceState(outState);
     }
 
     @Override
