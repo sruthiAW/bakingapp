@@ -67,7 +67,7 @@ public class RecipeStepDetailActivity extends AppCompatActivity {
 
         setUpBottomNavigatorScroll();
         setUpBottomNavigationUI();
-        setUpFragments(recipeId, currentStepId);
+        setUpFragments(recipeId, currentStepId, false);
     }
 
     private void setUpBottomNavigatorScroll() {
@@ -116,10 +116,12 @@ public class RecipeStepDetailActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
-    private void setUpFragments(String recipeId, int stepId) {
+    private void setUpFragments(String recipeId, int stepId, boolean forceLoad) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.step_detail_frag_container, RecipeStepDetailFragment.newInstance(recipeId, String.valueOf(stepId)));
-        fragmentTransaction.commit();
+        if (getSupportFragmentManager().findFragmentById(R.id.step_detail_frag_container) == null || forceLoad) {
+            fragmentTransaction.replace(R.id.step_detail_frag_container, RecipeStepDetailFragment.newInstance(recipeId, String.valueOf(stepId)));
+            fragmentTransaction.commit();
+        }
     }
 
     @OnClick({R.id.prev_tv, R.id.next_tv})
@@ -134,6 +136,6 @@ public class RecipeStepDetailActivity extends AppCompatActivity {
         }
 
         setUpBottomNavigationUI();
-        setUpFragments(recipeId, currentStepId);
+        setUpFragments(recipeId, currentStepId, true);
     }
 }

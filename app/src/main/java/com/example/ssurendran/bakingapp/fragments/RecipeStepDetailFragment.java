@@ -21,6 +21,7 @@ import com.example.ssurendran.bakingapp.R;
 import com.example.ssurendran.bakingapp.models.StepModel;
 import com.example.ssurendran.bakingapp.provider.RecipeContract;
 import com.example.ssurendran.bakingapp.provider.RecipeProvider;
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -51,6 +52,9 @@ public class RecipeStepDetailFragment extends Fragment {
 
     public static final String RECIPE_ID = "recipe_id";
     public static final String STEP_ID = "step_id";
+    private static final String SAVED_PLAYER_POSITION = "saved_player_position";
+    private static final String PLAY_WHEN_READY = "play_when_ready";
+    private static final String SAVED_CURRENT_WINDOW = "current_window";
 
     @BindView(R.id.media_container)
     FrameLayout mediaContainer;
@@ -70,6 +74,10 @@ public class RecipeStepDetailFragment extends Fragment {
 
     private String recipeId;
     private String stepId;
+
+    private long playerPosition = C.TIME_UNSET;
+    private boolean playWhenReady = true;
+    private int currentWindow = -1;
 
     public static RecipeStepDetailFragment newInstance() {
         return new RecipeStepDetailFragment();
@@ -98,8 +106,14 @@ public class RecipeStepDetailFragment extends Fragment {
             hideAllViews();
         }
 
-        setUpInitialUI();
+        if (savedInstanceState != null){
+            playerPosition = savedInstanceState.getLong(SAVED_PLAYER_POSITION, C.TIME_UNSET);
+            playWhenReady = savedInstanceState.getBoolean(PLAY_WHEN_READY, false);
+            currentWindow = savedInstanceState.getInt(SAVED_CURRENT_WINDOW, -1);
+        }
 
+        setUpInitialUI();
+        setRetainInstance(true);
         return view;
     }
 
@@ -138,10 +152,6 @@ public class RecipeStepDetailFragment extends Fragment {
         String videoUrlString = stepModel.getVideoUrlString();
         String imageUrlString = stepModel.getThumbnailUrlString();
 
-        if (TextUtils.isEmpty(videoUrlString) && isVideoFile(imageUrlString)) {
-            videoUrlString = imageUrlString;
-        }
-
         if (!TextUtils.isEmpty(videoUrlString)) {
             playerView.setVisibility(View.VISIBLE);
             thumbnail.setVisibility(View.GONE);
@@ -162,15 +172,6 @@ public class RecipeStepDetailFragment extends Fragment {
             mediaContainer.setVisibility(View.GONE);
         }
     }
-
-    private static boolean isVideoFile(String path) {
-        if (!TextUtils.isEmpty(path)) {
-            String mimeType = URLConnection.guessContentTypeFromName(path);
-            return mimeType != null && mimeType.startsWith("video");
-        }
-        return false;
-    }
-
 
     private void fetchStepDetails() {
         new AsyncTask<Void, Void, StepModel>() {
@@ -224,18 +225,25 @@ public class RecipeStepDetailFragment extends Fragment {
             LoadControl loadControl = new DefaultLoadControl();
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(renderersFactory, trackSelector, loadControl);
             playerView.setPlayer(mExoPlayer);
+
             // Prepare the MediaSource.
             String userAgent = Util.getUserAgent(getActivity(), "BakingApp");
             MediaSource mediaSource = new ExtractorMediaSource.Factory(new DefaultDataSourceFactory(getActivity(), userAgent))
                     .setExtractorsFactory(new DefaultExtractorsFactory())
                     .createMediaSource(mediaUri);
             mExoPlayer.prepare(mediaSource);
-            mExoPlayer.setPlayWhenReady(true);
+            mExoPlayer.setPlayWhenReady(playWhenReady);
+            if (currentWindow != -1 && playerPosition != C.TIME_UNSET){
+                mExoPlayer.seekTo(currentWindow, playerPosition);
+            }
         }
     }
 
     private void releasePlayer() {
         if (mExoPlayer != null) {
+            playerPosition = mExoPlayer.getCurrentPosition();
+            currentWindow = mExoPlayer.getCurrentWindowIndex();
+            playWhenReady = mExoPlayer.getPlayWhenReady();
             mExoPlayer.stop();
             mExoPlayer.release();
             mExoPlayer = null;
@@ -266,8 +274,21 @@ public class RecipeStepDetailFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
+    public void onPause() {
         releasePlayer();
+        super.onPause();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putLong(SAVED_PLAYER_POSITION, playerPosition);
+        outState.putBoolean(PLAY_WHEN_READY, playWhenReady);
+        outState.putInt(SAVED_CURRENT_WINDOW, currentWindow);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
     }
